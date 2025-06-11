@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Table List View -->
+        <record id="view_diferent_table_list" model="ir.ui.view">
+            <field name="name">diferent.table.list</field>
+            <field name="model">diferent.table</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="number"/>
+                    <field name="room_id"/>
+                    <field name="capacity"/>
+                    <field name="state"/>
+                    <field name="order_total"/>
+                    <field name="last_cleaned"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Table Form View -->
+        <record id="view_diferent_table_form" model="ir.ui.view">
+            <field name="name">diferent.table.form</field>
+            <field name="model">diferent.table</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_open_table" string="Open Table" 
+                                type="object" class="btn-primary"
+                                invisible="state not in ['available','cleaning']"/>
+                        <button name="action_close_table" string="Close Table" 
+                                type="object" class="btn-secondary"
+                                invisible="state != 'occupied'"/>
+                        <button name="action_clean_table" string="Mark as Clean" 
+                                type="object" class="btn-success"
+                                invisible="state != 'cleaning'"/>
+                        <field name="state" widget="statusbar" 
+                               statusbar_visible="available,occupied,cleaning"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_table" type="object" 
+                                    class="oe_stat_button" icon="fa-cutlery"
+                                    invisible="not active_order_id">
+                                <field name="order_total" widget="statinfo" string="Order Total"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="number"/>
+                                <field name="room_id"/>
+                                <field name="capacity"/>
+                            </group>
+                            <group>
+                                <field name="position_x"/>
+                                <field name="position_y"/>
+                                <field name="last_cleaned"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="notes"/>
+                        </group>
+                        <group string="Current Order" invisible="not active_order_id">
+                            <field name="active_order_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Table Kanban View -->
+        <record id="view_diferent_table_kanban" model="ir.ui.view">
+            <field name="name">diferent.table.kanban</field>
+            <field name="model">diferent.table</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="number"/>
+                    <field name="room_id"/>
+                    <field name="capacity"/>
+                    <field name="state"/>
+                    <field name="order_total"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <strong>Table <field name="number"/></strong>
+                                        <span class="float-right">
+                                            <field name="state" widget="label_selection" 
+                                                   options="{'classes': {'available': 'success', 'occupied': 'danger', 'reserved': 'warning', 'cleaning': 'info'}}"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="room_id"/>
+                                        <br/>
+                                        <i class="fa fa-users"/> <field name="capacity"/> people
+                                    </div>
+                                    <div class="o_kanban_record_bottom" t-if="record.order_total.raw_value > 0">
+                                        <div class="oe_kanban_bottom_left">
+                                            <span class="badge badge-pill badge-success">
+                                                €<field name="order_total"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Table Action -->
+        <record id="action_diferent_table" model="ir.actions.act_window">
+            <field name="name">Tables</field>
+            <field name="res_model">diferent.table</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first table!
+                </p>
+                <p>
+                    Tables are where your customers sit. 
+                    You can manage orders, track occupancy and organize your service.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

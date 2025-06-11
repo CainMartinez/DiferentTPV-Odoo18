@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Room List View -->
+        <record id="view_diferent_room_list" model="ir.ui.view">
+            <field name="name">diferent.room.list</field>
+            <field name="model">diferent.room</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="table_count"/>
+                    <field name="occupied_tables"/>
+                    <field name="active"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Room Form View -->
+        <record id="view_diferent_room_form" model="ir.ui.view">
+            <field name="name">diferent.room.form</field>
+            <field name="model">diferent.room</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_tables" type="object" 
+                                    class="oe_stat_button" icon="fa-table">
+                                <field name="table_count" widget="statinfo" string="Tables"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="sequence"/>
+                                <field name="active"/>
+                            </group>
+                            <group>
+                                <field name="color" widget="color"/>
+                                <field name="occupied_tables"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                        <notebook>
+                            <page string="Tables">
+                                <field name="table_ids">
+                                    <list>
+                                        <field name="number"/>
+                                        <field name="capacity"/>
+                                        <field name="state"/>
+                                        <field name="order_total"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Room Kanban View -->
+        <record id="view_diferent_room_kanban" model="ir.ui.view">
+            <field name="name">diferent.room.kanban</field>
+            <field name="model">diferent.room</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="table_count"/>
+                    <field name="occupied_tables"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click" t-attf-style="border-color: #{record.color.raw_value};">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="description"/>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <span class="badge badge-pill">
+                                                <i class="fa fa-table"/> <field name="table_count"/> Tables
+                                            </span>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <span class="badge badge-pill badge-info">
+                                                <field name="occupied_tables"/> Occupied
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Room Action -->
+        <record id="action_diferent_room" model="ir.actions.act_window">
+            <field name="name">Rooms</field>
+            <field name="res_model">diferent.room</field>
+            <field name="view_mode">kanban,list,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first room!
+                </p>
+                <p>
+                    Rooms help you organize your restaurant layout.
+                    You can have different areas like dining room, terrace, bar area, etc.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>

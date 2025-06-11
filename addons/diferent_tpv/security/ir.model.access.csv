@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_diferent_room,access_diferent_room,model_diferent_room,,1,1,1,1
+access_diferent_table,access_diferent_table,model_diferent_table,,1,1,1,1
+access_diferent_order,access_diferent_order,model_diferent_order,,1,1,1,1
+access_diferent_order_line,access_diferent_order_line,model_diferent_order_line,,1,1,1,1

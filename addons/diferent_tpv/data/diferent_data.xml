@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Sequence for order numbers -->
+        <record id="seq_diferent_order" model="ir.sequence">
+            <field name="name">Diferent Order</field>
+            <field name="code">diferent.order</field>
+            <field name="prefix">ORD</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- Sample rooms data -->
+        <record id="room_main_dining" model="diferent.room">
+            <field name="name">Main Dining Room</field>
+            <field name="sequence">10</field>
+            <field name="color">#3498db</field>
+            <field name="description">Main dining area with view to the street</field>
+        </record>
+
+        <record id="room_terrace" model="diferent.room">
+            <field name="name">Terrace</field>
+            <field name="sequence">20</field>
+            <field name="color">#2ecc71</field>
+            <field name="description">Outdoor terrace area</field>
+        </record>
+
+        <record id="room_bar" model="diferent.room">
+            <field name="name">Bar Area</field>
+            <field name="sequence">30</field>
+            <field name="color">#e74c3c</field>
+            <field name="description">Bar counter and high tables</field>
+        </record>
+
+        <!-- Sample tables -->
+        <record id="table_01_main" model="diferent.table">
+            <field name="number">01</field>
+            <field name="room_id" ref="room_main_dining"/>
+            <field name="capacity">4</field>
+            <field name="position_x">100</field>
+            <field name="position_y">100</field>
+        </record>
+
+        <record id="table_02_main" model="diferent.table">
+            <field name="number">02</field>
+            <field name="room_id" ref="room_main_dining"/>
+            <field name="capacity">2</field>
+            <field name="position_x">200</field>
+            <field name="position_y">100</field>
+        </record>
+
+        <record id="table_03_main" model="diferent.table">
+            <field name="number">03</field>
+            <field name="room_id" ref="room_main_dining"/>
+            <field name="capacity">6</field>
+            <field name="position_x">300</field>
+            <field name="position_y">100</field>
+        </record>
+
+        <record id="table_t01_terrace" model="diferent.table">
+            <field name="number">T01</field>
+            <field name="room_id" ref="room_terrace"/>
+            <field name="capacity">4</field>
+            <field name="position_x">150</field>
+            <field name="position_y">150</field>
+        </record>
+
+        <record id="table_b01_bar" model="diferent.table">
+            <field name="number">B01</field>
+            <field name="room_id" ref="room_bar"/>
+            <field name="capacity">2</field>
+            <field name="position_x">100</field>
+            <field name="position_y">200</field>
+        </record>
+    </data>
+</odoo>

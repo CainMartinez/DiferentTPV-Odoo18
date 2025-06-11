@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main Menu -->
+        <menuitem id="menu_diferent_tpv_root" 
+                  name="Diferent TPV" 
+                  sequence="10"/>
+
+        <!-- Rooms Menu -->
+        <menuitem id="menu_diferent_rooms" 
+                  name="Rooms" 
+                  parent="menu_diferent_tpv_root" 
+                  action="action_diferent_room"
+                  sequence="10"/>
+
+        <!-- Tables Menu -->
+        <menuitem id="menu_diferent_tables" 
+                  name="Tables" 
+                  parent="menu_diferent_tpv_root" 
+                  action="action_diferent_table"
+                  sequence="20"/>
+
+        <!-- Orders Menu -->
+        <menuitem id="menu_diferent_orders" 
+                  name="Orders" 
+                  parent="menu_diferent_tpv_root" 
+                  action="action_diferent_order"
+                  sequence="30"/>
+    </data>
+</odoo>

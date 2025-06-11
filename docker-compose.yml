@@ -1,0 +1,44 @@
+services:
+  web:
+    image: odoo:18
+    ports:
+      - "8069:8069"
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./config/odoo.conf:/etc/odoo/odoo.conf
+    environment:
+      - HOST=${DB_HOST}
+      - USER=${DB_USER}
+      - PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - HTTP_PORT=${HTTP_PORT}
+      - ADMIN_PASSWD=${ADMIN_PASSWD}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - LOG_FILE=${LOG_FILE}
+      - WORKERS=${WORKERS}
+      - MAX_CRON_THREADS=${MAX_CRON_THREADS}
+      - ADDONS_PATH=${ADDONS_PATH}
+    depends_on:
+      - db
+    restart: unless-stopped
+    command: ["odoo", "-c", "/etc/odoo/odoo.conf", "-i", "base,sale,purchase,stock,account,hr,point_of_sale", "-d", "odoo_db"]
+    # command: ["odoo", "-c", "/etc/odoo/odoo.conf"]
+
+
+  db:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    container_name: odoo18-db
+
+volumes:
+  db_data:

@@ -22,7 +22,25 @@ class DiferentTable(models.Model):
     # Position for floor plan (for future graphic view)
     position_x = fields.Float('Position X', default=0)
     position_y = fields.Float('Position Y', default=0)
+
+    width = fields.Float('Table Width', default=80)  # píxeles
+    height = fields.Float('Table Height', default=80)
+    rotation = fields.Float('Rotation Angle', default=0)  # grados
+    shape = fields.Selection([
+        ('square', 'Square'),
+        ('round', 'Round'),
+        ('rectangle', 'Rectangle')
+    ], default='square', string='Table Shape')
     
+    def update_position(self, x, y):
+        """Update table position from frontend"""
+        self.ensure_one()
+        self.write({
+            'position_x': x,
+            'position_y': y
+        })
+        return True
+        
     # Active order
     active_order_id = fields.Many2one('diferent.order', 'Active Order')
     order_total = fields.Float('Order Total', related='active_order_id.amount_total')

@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+       
         <!-- Main Menu -->
         <menuitem id="menu_diferent_tpv_root" 
                   name="Diferent TPV" 
                   sequence="10"/>
+
+        <!-- Floor Plan Menu -->
+        <menuitem id="menu_diferent_floor_plan" 
+                  name="Floor Plan" 
+                  parent="menu_diferent_tpv_root" 
+                  action="action_diferent_room_floor_plan"
+                  sequence="5"/>
 
         <!-- Rooms Menu -->
         <menuitem id="menu_diferent_rooms" 

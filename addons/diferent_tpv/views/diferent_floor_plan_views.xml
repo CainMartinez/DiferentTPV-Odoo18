@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Floor Plan Kanban View -->
+        <record id="view_diferent_table_floor_plan_kanban" model="ir.ui.view">
+            <field name="name">diferent.table.floor.plan.kanban</field>
+            <field name="model">diferent.table</field>
+            <field name="arch" type="xml">
+                <kanban class="o_floor_plan_kanban">
+                    <field name="id"/>
+                    <field name="number"/>
+                    <field name="capacity"/>
+                    <field name="state"/>
+                    <field name="position_x"/>
+                    <field name="position_y"/>
+                    <field name="width"/>
+                    <field name="height"/>
+                    <field name="shape"/>
+                    <field name="room_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_table_kanban_card" 
+                                 t-att-data-table-id="record.id.raw_value"
+                                 t-attf-style="
+                                    position: absolute;
+                                    left: #{record.position_x.raw_value || 100}px; 
+                                    top: #{record.position_y.raw_value || 100}px;
+                                    width: #{record.width.raw_value || 80}px;
+                                    height: #{record.height.raw_value || 80}px;
+                                 "
+                                 t-attf-class="o_table_shape_#{record.shape.raw_value || 'round'} o_table_state_#{record.state.raw_value}">
+                                <div class="o_table_content">
+                                    <div class="o_table_number">
+                                        <strong t-esc="record.number.value"/>
+                                    </div>
+                                    <div class="o_table_capacity">
+                                        <i class="fa fa-users"/> <t t-esc="record.capacity.value"/>
+                                    </div>
+                                    <div class="o_table_state">
+                                        <t t-esc="record.state.value"/>
+                                    </div>
+                                </div>
+                                <div class="o_table_actions">
+                                    <button type="object" name="action_open_table" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-external-link"/>
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Floor Plan Action -->
+        <record id="action_diferent_room_floor_plan" model="ir.actions.act_window">
+            <field name="name">Floor Plan</field>
+            <field name="res_model">diferent.table</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_diferent_table_floor_plan_kanban"/>
+            <field name="context">{"group_by": "room_id"}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No tables found!
+                </p>
+                <p>
+                    Create some tables in your rooms first, then you can arrange them visually in the floor plan.
+                </p>
+            </field>
+        </record>
+
+        <!-- Search view for Floor Plan -->
+        <record id="view_diferent_table_search_floor_plan" model="ir.ui.view">
+            <field name="name">diferent.table.search.floor.plan</field>
+            <field name="model">diferent.table</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="number"/>
+                    <field name="room_id"/>
+                    <filter string="Available Tables" name="available" domain="[('state', '=', 'available')]"/>
+                    <filter string="Occupied Tables" name="occupied" domain="[('state', '=', 'occupied')]"/>
+                    <separator/>
+                    <group expand="1" string="Group By">
+                        <filter string="Room" name="room_id" context="{'group_by': 'room_id'}"/>
+                        <filter string="State" name="state" context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

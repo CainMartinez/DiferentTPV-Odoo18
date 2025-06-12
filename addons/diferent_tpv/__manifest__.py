@@ -20,8 +20,15 @@
         'views/diferent_room_views.xml',
         'views/diferent_table_views.xml',
         'views/diferent_order_views.xml',
+        'views/diferent_floor_plan_views.xml',
         'views/diferent_room_menu.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'diferent_tpv/static/src/css/floor_plan.css',
+            # 'diferent_tpv/static/src/js/floor_plan_kanban.js',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,

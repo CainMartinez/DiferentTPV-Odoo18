@@ -1,0 +1,145 @@
+.o_floor_plan_kanban {
+    position: relative;
+    min-height: 800px;
+    background: #f8f9fa;
+    background-image: 
+        linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    overflow: auto;
+    padding: 20px;
+}
+
+.o_table_kanban_card {
+    position: absolute;
+    cursor: move;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    user-select: none;
+    min-width: 60px;
+    min-height: 60px;
+}
+
+.o_table_kanban_card:hover {
+    transform: scale(1.05);
+    z-index: 100;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Formas de mesa */
+.o_table_shape_round {
+    border-radius: 50%;
+}
+
+.o_table_shape_square {
+    border-radius: 8px;
+}
+
+.o_table_shape_rectangle {
+    border-radius: 8px;
+}
+
+/* Estados de mesa */
+.o_table_state_available {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+}
+
+.o_table_state_occupied {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+}
+
+.o_table_state_reserved {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+}
+
+.o_table_state_cleaning {
+    border-color: #17a2b8;
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+}
+
+.o_table_content {
+    text-align: center;
+    pointer-events: none;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.o_table_number {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.o_table_capacity {
+    color: #6c757d;
+    font-size: 10px;
+}
+
+.o_table_state {
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.o_table_total {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+.o_table_actions {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.o_table_kanban_card:hover .o_table_actions {
+    opacity: 1;
+}
+
+/* Toolbar para Floor Plan */
+.o_floor_plan_toolbar {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 10px;
+    border-bottom: 1px solid #dee2e6;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.o_floor_plan_tools {
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .o_table_kanban_card {
+        min-width: 50px;
+        min-height: 50px;
+    }
+    
+    .o_table_content {
+        font-size: 9px;
+    }
+    
+    .o_table_number {
+        font-size: 11px;
+    }
+}

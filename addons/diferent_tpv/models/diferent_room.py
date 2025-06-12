@@ -38,3 +38,19 @@ class DiferentRoom(models.Model):
             'domain': [('room_id', '=', self.id)],
             'context': {'default_room_id': self.id},
         }
+
+    def action_floor_plan(self):
+        """Open floor plan view for this room"""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': f'Floor Plan - {self.name}',
+            'res_model': 'diferent.table',
+            'view_mode': 'kanban',
+            'view_id': self.env.ref('diferent_tpv.view_diferent_table_floor_plan_kanban').id,
+            'domain': [('room_id', '=', self.id)],
+            'context': {
+                'default_room_id': self.id,
+                'room_name': self.name,
+                'floor_plan_mode': True
+            },
+        }

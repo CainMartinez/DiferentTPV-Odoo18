@@ -2,7 +2,7 @@ services:
   web:
     image: odoo:18
     ports:
-      - "8069:8069"
+      - "${HTTP_PORT}:8069"
     volumes:
       - ./addons:/mnt/extra-addons
       - ./config/odoo.conf:/etc/odoo/odoo.conf
@@ -10,18 +10,6 @@ services:
       - HOST=${DB_HOST}
       - USER=${DB_USER}
       - PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - HTTP_PORT=${HTTP_PORT}
-      - ADMIN_PASSWD=${ADMIN_PASSWD}
-      - LOG_LEVEL=${LOG_LEVEL}
-      - LOG_FILE=${LOG_FILE}
-      - WORKERS=${WORKERS}
-      - MAX_CRON_THREADS=${MAX_CRON_THREADS}
-      - ADDONS_PATH=${ADDONS_PATH}
     depends_on:
       - db
     restart: unless-stopped

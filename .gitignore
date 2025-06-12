@@ -3,10 +3,13 @@
 .env.local
 .env.production
 
+# Odoo configuration files
+config/odoo.conf
+
 # Docker
 docker-compose.override.yml
 
-# Odoo
+# Odoo runtime files
 filestore/
 sessions/
 *.log

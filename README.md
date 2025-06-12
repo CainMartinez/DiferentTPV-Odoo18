@@ -34,9 +34,10 @@ odoo18-project/
 │       └── data/                        # Datos iniciales
 │           └── diferent_data.xml
 ├── config/
-│   └── odoo.conf                        # Configuración de Odoo
-├── .env                                 # Variables de entorno
-├── .env.example                         # Plantilla de variables
+│   ├── odoo.conf                        # Configuración de Odoo (no se sube a Git)
+│   └── odoo.conf.example               # Plantilla de configuración
+├── .env                                 # Variables de entorno para Docker
+├── .env.example                         # Plantilla de variables de entorno
 ├── docker-compose.yml                   # Configuración Docker
 ├── Dockerfile                           # Imagen personalizada
 ├── requirements.txt                     # Dependencias Python
@@ -68,7 +69,7 @@ Copia el archivo de ejemplo y personalízalo:
 cp .env.example .env
 ```
 
-Edita `.env` con tus credenciales:
+Edita `.env` con tus credenciales para Docker:
 
 ```env
 # Database Configuration
@@ -94,7 +95,42 @@ MAX_CRON_THREADS=1
 ADDONS_PATH=/mnt/extra-addons
 ```
 
-### 2. Crear Directorios Necesarios
+### 2. Configurar Odoo
+
+Copia el archivo de configuración de Odoo:
+
+```bash
+cp config/odoo.conf.example config/odoo.conf
+```
+
+Edita `config/odoo.conf` con tu configuración específica:
+
+```properties
+[options]
+# Database configuration
+db_name = odoo_db
+db_user = odoo_user
+db_password = mi_password_seguro
+db_host = db
+db_port = 5432
+
+# Server configuration
+http_port = 8069
+addons_path = /mnt/extra-addons
+
+# Logging
+log_level = info
+log_file = /var/log/odoo/odoo.log
+
+# Workers
+workers = 2
+max_cron_threads = 1
+
+# Admin password
+admin_passwd = admin_password_seguro
+```
+
+### 3. Crear Directorios Necesarios
 
 ```bash
 mkdir -p addons/custom_module/{models,views,security,data}
@@ -231,12 +267,22 @@ Sala → Mesas → Pedido Activo → Líneas de Productos
 Color   Estado   Camarero    Stock Check
 ```
 
-## 🔒 Seguridad
+## 🔒 Seguridad y Configuración
 
-- Las credenciales están en variables de entorno
-- El archivo `.env` está excluido del control de versiones
+- **`.env`**: Variables de entorno para Docker Compose (no se sube a Git)
+- **`config/odoo.conf`**: Configuración específica de Odoo (no se sube a Git)
+- **`config/odoo.conf.example`**: Plantilla de configuración para otros desarrolladores
 - Permisos granulares por modelo
 - Contraseña maestra para administración de BD
+
+## 📝 Archivos de Configuración
+
+| Archivo | Propósito | ¿Se sube a Git? |
+|---------|-----------|-----------------|
+| `.env` | Variables de entorno para Docker | ❌ No |
+| `.env.example` | Plantilla de variables de entorno | ✅ Sí |
+| `config/odoo.conf` | Configuración de Odoo | ❌ No |
+| `config/odoo.conf.example` | Plantilla de configuración de Odoo | ✅ Sí |
 
 ## 🚀 Siguientes Pasos de Desarrollo
 

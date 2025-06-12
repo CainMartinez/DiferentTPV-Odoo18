@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Vista Kanban de Productos para TPV -->
+        <record id="view_product_product_tpv_kanban" model="ir.ui.view">
+            <field name="name">product.product.tpv.kanban</field>
+            <field name="model">product.product</field>
+            <field name="arch" type="xml">
+                <kanban class="o_tpv_product_kanban">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="list_price"/>
+                    <field name="image_1920"/>
+                    <field name="categ_id"/>
+                    <field name="description_sale"/>
+                    <field name="currency_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card oe_kanban_global_click o_tpv_product_card" 
+                                 t-att-data-product-id="record.id.raw_value">
+                                <div class="o_kanban_image">
+                                    <img t-att-src="kanban_image('product.product', 'image_1920', record.id.raw_value)" 
+                                         alt="Product Image" class="o_tpv_product_image"/>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                        </div>
+                                        <div class="o_tpv_product_price">
+                                            <span class="oe_currency_value">
+                                                <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="categ_id" class="text-muted"/>
+                                        <t t-if="record.description_sale.raw_value">
+                                            <div class="text-muted o_tpv_product_description">
+                                                <field name="description_sale"/>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <div class="o_tpv_product_actions">
+                                    <button name="action_add_to_tpv_order" 
+                                            type="object" 
+                                            class="btn btn-primary btn-sm">
+                                        <i class="fa fa-plus"/> Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Acción principal para selección de productos -->
+        <record id="action_product_tpv_selection" model="ir.actions.act_window">
+            <field name="name">Seleccionar Productos</field>
+            <field name="res_model">product.product</field>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="view_product_product_tpv_kanban"/>
+            <field name="domain">[('sale_ok', '=', True)]</field>
+            <field name="context">{
+                'search_default_filter_to_sell': 1,
+                'search_default_filter_to_purchase': 0,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Selecciona productos para añadir al pedido
+                </p>
+                <p>
+                    Haz clic en cualquier producto para añadirlo directamente al pedido de la mesa.
+                </p>
+            </field>
+        </record>
+
+        <!-- Vista de búsqueda personalizada para TPV -->
+        <record id="view_product_search_tpv" model="ir.ui.view">
+            <field name="name">product.product.search.tpv</field>
+            <field name="model">product.product</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" string="Producto" 
+                           filter_domain="['|', ('name', 'ilike', self), ('default_code', 'ilike', self)]"/>
+                    <filter string="Comidas" name="filter_food" 
+                            domain="[('categ_id.name', 'ilike', 'food')]"/>
+                    <filter string="Bebidas" name="filter_drinks" 
+                            domain="[('categ_id.name', 'ilike', 'drink')]"/>
+                    <filter string="Postres" name="filter_desserts" 
+                            domain="[('categ_id.name', 'ilike', 'dessert')]"/>
+                    <separator/>
+                    <filter string="Disponibles" name="filter_available" 
+                            domain="[('sale_ok', '=', True)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Categoría" name="group_category" 
+                                context="{'group_by': 'categ_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

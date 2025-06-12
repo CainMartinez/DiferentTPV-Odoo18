@@ -58,7 +58,7 @@ class DiferentTable(models.Model):
                 table.name = f"Table {table.number or 'New'}"
     
     def action_open_table(self):
-        """Action to open table and manage orders"""
+        """Action to open table and show product selection"""
         self.ensure_one()
         
         if not self.active_order_id:
@@ -71,12 +71,18 @@ class DiferentTable(models.Model):
             self.active_order_id = order.id
             self.state = 'occupied'
         
+        # Abrir vista de productos para selección directa
         return {
             'type': 'ir.actions.act_window',
-            'name': f'Order - {self.name}',
-            'res_model': 'diferent.order',
-            'res_id': self.active_order_id.id,
-            'view_mode': 'form',
+            'name': f'Mesa {self.name} - Seleccionar Productos',
+            'res_model': 'product.product',
+            'view_mode': 'kanban,list',
+            'domain': [('sale_ok', '=', True), ('available_in_pos', '=', True)],
+            'context': {
+                'active_table_id': self.id,
+                'active_order_id': self.active_order_id.id,
+                'search_default_consumable': 1,
+            },
             'target': 'current',
         }
     

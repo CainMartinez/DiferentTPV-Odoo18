@@ -3,142 +3,121 @@ from odoo.exceptions import UserError
 
 class DiferentOrder(models.Model):
     _name = 'diferent.order'
-    _description = 'Restaurant Table Order'
-    _order = 'create_date desc'
+    _description = 'Restaurant Order'
+    _order = 'date_created desc'
 
     name = fields.Char('Order Number', default='New', readonly=True)
-    table_id = fields.Many2one('diferent.table', 'Table', required=True)
-    room_id = fields.Many2one('diferent.room', related='table_id.room_id', store=True)
-    
-    # Order state
+    table_id = fields.Many2one('diferent.table', string='Table', required=True)
+    room_id = fields.Many2one('diferent.room', string='Room', related='table_id.room_id', store=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
         ('kitchen', 'In Kitchen'),
-        ('ready', 'Ready to Serve'),
+        ('ready', 'Ready'),
         ('served', 'Served'),
-        ('paid', 'Paid'),
+        ('closed', 'Closed'),
         ('cancelled', 'Cancelled')
-    ], string='State', default='draft')
+    ], default='draft', required=True, tracking=True)
     
-    # Order lines
-    line_ids = fields.One2many('diferent.order.line', 'order_id', 'Order Lines')
+    # Dates
+    date_created = fields.Datetime('Created', default=fields.Datetime.now, readonly=True)
+    date_confirmed = fields.Datetime('Confirmed', readonly=True)
+    date_closed = fields.Datetime('Closed', readonly=True)
     
-    # Amounts
-    amount_total = fields.Float('Total Amount', compute='_compute_amount_total', store=True)
-    amount_tax = fields.Float('Tax Amount', compute='_compute_amount_total', store=True)
-    amount_untaxed = fields.Float('Untaxed Amount', compute='_compute_amount_total', store=True)
+    # Relations
+    line_ids = fields.One2many('diferent.order.line', 'order_id', string='Order Lines')
+    waiter_id = fields.Many2one('res.users', string='Waiter', default=lambda self: self.env.user)
     
-    # People and timing
-    waiter_id = fields.Many2one('res.users', 'Waiter', default=lambda self: self.env.user)
-    customer_count = fields.Integer('Number of Customers', default=1)
-    order_date = fields.Datetime('Order Date', default=fields.Datetime.now)
-    kitchen_date = fields.Datetime('Sent to Kitchen')
-    ready_date = fields.Datetime('Ready Date')
-    served_date = fields.Datetime('Served Date')
+    # Computed fields
+    total_items = fields.Integer('Total Items', compute='_compute_totals', store=True)
+    amount_untaxed = fields.Float('Untaxed Amount', compute='_compute_totals', store=True)
+    amount_tax = fields.Float('Tax Amount', compute='_compute_totals', store=True)
+    amount_total = fields.Float('Total Amount', compute='_compute_totals', store=True)
     
-    # Notes
-    notes = fields.Text('Special Notes')
+    # Other fields
+    notes = fields.Text('Notes')
+    
+    @api.depends('line_ids.quantity', 'line_ids.unit_price', 'line_ids.total_price')
+    def _compute_totals(self):
+        for order in self:
+            order.total_items = sum(order.line_ids.mapped('quantity'))
+            order.amount_untaxed = sum(order.line_ids.mapped('total_price'))
+            order.amount_tax = order.amount_untaxed * 0.21  # 21% IVA by default
+            order.amount_total = order.amount_untaxed + order.amount_tax
     
     @api.model
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
             vals['name'] = self.env['ir.sequence'].next_by_code('diferent.order') or 'New'
-        return super().create(vals)
-    
-    @api.depends('line_ids.subtotal', 'line_ids.tax_amount')
-    def _compute_amount_total(self):
-        for order in self:
-            amount_untaxed = sum(line.subtotal for line in order.line_ids)
-            amount_tax = sum(line.tax_amount for line in order.line_ids)
-            order.amount_untaxed = amount_untaxed
-            order.amount_tax = amount_tax
-            order.amount_total = amount_untaxed + amount_tax
+        return super(DiferentOrder, self).create(vals)
     
     def action_confirm(self):
-        """Confirm order and send to kitchen"""
+        """Confirmar el pedido"""
+        self.ensure_one()
+        if not self.line_ids:
+            raise UserError('Cannot confirm an order without products.')
         self.state = 'confirmed'
-        self.kitchen_date = fields.Datetime.now()
-        # Here you can add logic to notify kitchen
+        self.date_confirmed = fields.Datetime.now()
+        return True
     
     def action_to_kitchen(self):
-        """Send order to kitchen"""
-        if not self.line_ids:
-            raise UserError("Cannot send empty order to kitchen")
+        """Enviar a cocina"""
+        self.ensure_one()
         self.state = 'kitchen'
-        self.kitchen_date = fields.Datetime.now()
+        return True
     
     def action_ready(self):
-        """Mark order as ready to serve"""
+        """Marcar como listo"""
+        self.ensure_one()
         self.state = 'ready'
-        self.ready_date = fields.Datetime.now()
+        return True
     
     def action_served(self):
-        """Mark order as served"""
+        """Marcar como servido"""
+        self.ensure_one()
         self.state = 'served'
-        self.served_date = fields.Datetime.now()
+        return True
     
     def action_close(self):
-        """Close order and generate sale"""
-        self.state = 'paid'
-        # Here you can create sale.order for invoicing
+        """Cerrar pedido"""
+        self.ensure_one()
+        self.state = 'closed'
+        self.date_closed = fields.Datetime.now()
+        # Liberar mesa
+        if self.table_id:
+            self.table_id.state = 'cleaning'
+        return True
     
     def action_cancel(self):
-        """Cancel order"""
+        """Cancelar pedido"""
+        self.ensure_one()
         self.state = 'cancelled'
-        if self.table_id.active_order_id == self:
-            self.table_id.active_order_id = False
-            self.table_id.state = 'available'
+        return True
+
 
 class DiferentOrderLine(models.Model):
     _name = 'diferent.order.line'
-    _description = 'Restaurant Order Line'
+    _description = 'Order Line'
 
-    order_id = fields.Many2one('diferent.order', 'Order', required=True, ondelete='cascade')
-    product_id = fields.Many2one('product.product', 'Product', required=True)
-    quantity = fields.Float('Quantity', default=1.0)
-    unit_price = fields.Float('Unit Price', related='product_id.list_price')
-    subtotal = fields.Float('Subtotal', compute='_compute_subtotal', store=True)
-    tax_amount = fields.Float('Tax Amount', compute='_compute_subtotal', store=True)
+    order_id = fields.Many2one('diferent.order', string='Order', required=True, ondelete='cascade')
+    product_id = fields.Many2one('product.product', string='Product', required=True)
+    quantity = fields.Float('Quantity', default=1.0, required=True)
+    unit_price = fields.Float('Unit Price', required=True)
+    total_price = fields.Float('Total', compute='_compute_total', store=True)
+    notes = fields.Text('Notes')
     
-    # Special instructions
-    notes = fields.Text('Special Instructions')
-    
-    # Stock control
-    available_stock = fields.Float('Available Stock', related='product_id.qty_available')
-    
-    # Kitchen status for this line
-    kitchen_state = fields.Selection([
-        ('waiting', 'Waiting'),
-        ('preparing', 'Preparing'),
-        ('ready', 'Ready')
-    ], string='Kitchen State', default='waiting')
-    
-    @api.depends('quantity', 'unit_price', 'product_id.taxes_id')
-    def _compute_subtotal(self):
+    @api.depends('quantity', 'unit_price')
+    def _compute_total(self):
         for line in self:
-            line.subtotal = line.quantity * line.unit_price
-            # Basic tax calculation (you might want to improve this)
-            if line.product_id.taxes_id:
-                tax_rate = sum(line.product_id.taxes_id.mapped('amount')) / 100
-                line.tax_amount = line.subtotal * tax_rate
-            else:
-                line.tax_amount = 0.0
+            line.total_price = line.quantity * line.unit_price
     
-    @api.constrains('quantity', 'product_id')
-    def _check_stock(self):
-        for line in self:
-            if line.product_id.type == 'product':  # Only storable products
-                if line.quantity > line.available_stock:
-                    raise UserError(
-                        f'Not enough stock for {line.product_id.name}. '
-                        f'Available: {line.available_stock}'
-                    )
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.unit_price = self.product_id.list_price
     
-    def action_start_preparing(self):
-        """Mark this line as being prepared in kitchen"""
-        self.kitchen_state = 'preparing'
-    
-    def action_ready(self):
-        """Mark this line as ready"""
-        self.kitchen_state = 'ready'
+    def action_remove_line(self):
+        """Eliminar línea del pedido"""
+        self.ensure_one()
+        self.unlink()
+        return {'type': 'ir.actions.client', 'tag': 'reload'}

@@ -1,97 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Sequence for order numbers -->
+        <!-- Secuencia para numeración de pedidos -->
         <record id="seq_diferent_order" model="ir.sequence">
             <field name="name">Diferent Order</field>
             <field name="code">diferent.order</field>
-            <field name="prefix">ORD</field>
+            <field name="prefix">ORD-</field>
             <field name="padding">4</field>
-            <field name="number_next">1</field>
             <field name="number_increment">1</field>
+            <field name="number_next">1</field>
         </record>
-
-        <!-- Sample rooms data -->
+        
+        <!-- Datos de ejemplo: Salas -->
         <record id="room_main_dining" model="diferent.room">
-            <field name="name">Main Dining Room</field>
+            <field name="name">Interior</field>
             <field name="sequence">10</field>
             <field name="color">#3498db</field>
-            <field name="description">Main dining area with view to the street</field>
+            <field name="description">Sala principal del restaurante</field>
         </record>
-
+        
         <record id="room_terrace" model="diferent.room">
-            <field name="name">Terrace</field>
+            <field name="name">Terraza</field>
             <field name="sequence">20</field>
-            <field name="color">#2ecc71</field>
-            <field name="description">Outdoor terrace area</field>
+            <field name="color">#27ae60</field>
+            <field name="description">Terraza exterior</field>
         </record>
 
-        <record id="room_bar" model="diferent.room">
-            <field name="name">Bar Area</field>
+        <record id="room_carpa" model="diferent.room">
+            <field name="name">Carpa</field>
             <field name="sequence">30</field>
-            <field name="color">#e74c3c</field>
-            <field name="description">Bar counter and high tables</field>
+            <field name="color">#27a320</field>
+            <field name="description">Carpa exterior</field>
         </record>
-
-        <!-- Sample tables CON TODOS LOS CAMPOS -->
-        <record id="table_01_main" model="diferent.table">
+        
+        <!-- Mesas de ejemplo -->
+        <record id="table_01" model="diferent.table">
             <field name="number">01</field>
             <field name="room_id" ref="room_main_dining"/>
             <field name="capacity">4</field>
-            <field name="state">available</field>
-            <field name="shape">round</field>
             <field name="position_x">100</field>
             <field name="position_y">100</field>
-            <field name="width">80</field>
-            <field name="height">80</field>
         </record>
-
-        <record id="table_02_main" model="diferent.table">
+        
+        <record id="table_02" model="diferent.table">
             <field name="number">02</field>
             <field name="room_id" ref="room_main_dining"/>
             <field name="capacity">2</field>
-            <field name="state">occupied</field>
-            <field name="shape">square</field>
             <field name="position_x">250</field>
-            <field name="position_y">120</field>
-            <field name="width">60</field>
-            <field name="height">60</field>
+            <field name="position_y">100</field>
         </record>
-
-        <record id="table_03_main" model="diferent.table">
+        
+        <record id="table_03" model="diferent.table">
             <field name="number">03</field>
-            <field name="room_id" ref="room_main_dining"/>
-            <field name="capacity">6</field>
-            <field name="state">reserved</field>
-            <field name="shape">rectangle</field>
-            <field name="position_x">120</field>
-            <field name="position_y">250</field>
-            <field name="width">120</field>
-            <field name="height">80</field>
-        </record>
-
-        <record id="table_t01_terrace" model="diferent.table">
-            <field name="number">T01</field>
             <field name="room_id" ref="room_terrace"/>
-            <field name="capacity">4</field>
-            <field name="state">cleaning</field>
-            <field name="shape">round</field>
-            <field name="position_x">150</field>
-            <field name="position_y">150</field>
-            <field name="width">80</field>
-            <field name="height">80</field>
+            <field name="capacity">6</field>
+            <field name="position_x">100</field>
+            <field name="position_y">250</field>
         </record>
 
-        <record id="table_b01_bar" model="diferent.table">
-            <field name="number">B01</field>
-            <field name="room_id" ref="room_bar"/>
-            <field name="capacity">2</field>
-            <field name="state">available</field>
-            <field name="shape">square</field>
+         <record id="table_04" model="diferent.table">
+            <field name="number">04</field>
+            <field name="room_id" ref="room_carpa"/>
+            <field name="capacity">4</field>
             <field name="position_x">100</field>
-            <field name="position_y">200</field>
-            <field name="width">60</field>
-            <field name="height">60</field>
+            <field name="position_y">250</field>
         </record>
     </data>
 </odoo>

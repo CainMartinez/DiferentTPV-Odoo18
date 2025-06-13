@@ -28,11 +28,5 @@
                   action="action_diferent_table"
                   sequence="20"/>
 
-        <!-- Orders Menu -->
-        <menuitem id="menu_diferent_orders" 
-                  name="Orders" 
-                  parent="menu_diferent_tpv_root" 
-                  action="action_diferent_order"
-                  sequence="30"/>
     </data>
 </odoo>

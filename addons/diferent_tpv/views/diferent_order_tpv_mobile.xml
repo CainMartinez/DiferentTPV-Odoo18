@@ -1,107 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- Vista Kanban de Productos para TPV -->
-        <record id="view_product_product_tpv_kanban" model="ir.ui.view">
-            <field name="name">product.product.tpv.kanban</field>
-            <field name="model">product.product</field>
+        <!-- Vista TPV Completa - Productos + Pedido -->
+        <record id="view_tpv_complete_form" model="ir.ui.view">
+            <field name="name">tpv.complete.form</field>
+            <field name="model">diferent.order</field>
             <field name="arch" type="xml">
-                <kanban class="o_tpv_product_kanban">
-                    <field name="id"/>
-                    <field name="name"/>
-                    <field name="list_price"/>
-                    <field name="image_1920"/>
-                    <field name="categ_id"/>
-                    <field name="description_sale"/>
-                    <field name="currency_id"/>
-                    <templates>
-                        <t t-name="kanban-box">
-                            <div class="oe_kanban_card oe_kanban_global_click o_tpv_product_card" 
-                                 t-att-data-product-id="record.id.raw_value">
-                                <div class="o_kanban_image">
-                                    <img t-att-src="kanban_image('product.product', 'image_1920', record.id.raw_value)" 
-                                         alt="Product Image" class="o_tpv_product_image"/>
-                                </div>
-                                <div class="oe_kanban_details">
-                                    <div class="o_kanban_record_top">
-                                        <div class="o_kanban_record_headings">
-                                            <strong class="o_kanban_record_title">
-                                                <field name="name"/>
-                                            </strong>
-                                        </div>
-                                        <div class="o_tpv_product_price">
-                                            <span class="oe_currency_value">
-                                                <field name="list_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                            </span>
-                                        </div>
+                <form create="false" edit="true">
+                    <header>
+                        <button name="action_confirm" string="✅ Confirmar Pedido" 
+                                type="object" class="btn-success"
+                                invisible="state != 'draft' or not line_ids"/>
+                        <button name="action_to_kitchen" string="👨‍🍳 Enviar a Cocina" 
+                                type="object" class="btn-info"
+                                invisible="state != 'confirmed'"/>
+                        <button name="action_close" string="🎉 Finalizar Pedido" 
+                                type="object" class="btn-primary"
+                                invisible="state not in ['confirmed', 'kitchen', 'ready', 'served']"/>
+                        <field name="state" widget="statusbar" 
+                               statusbar_visible="draft,confirmed,kitchen,ready,served,closed"/>
+                    </header>
+                    
+                    <sheet>
+                        <!-- Información de la mesa -->
+                        <div class="oe_title">
+                            <h1 class="d-flex align-items-center">
+                                🍽️ <field name="table_id" readonly="1"/> 
+                                <span class="ml-2 badge badge-info">
+                                    <field name="room_id" readonly="1"/>
+                                </span>
+                                <span class="ml-auto h3 text-success">
+                                    Total: <field name="amount_total" readonly="1"/>€
+                                </span>
+                            </h1>
+                        </div>
+                        
+                        <!-- Layout en dos columnas -->
+                        <div class="row">
+                            <!-- COLUMNA IZQUIERDA: PRODUCTOS -->
+                            <div class="col-md-8">
+                                <div class="o_tpv_products_section">
+                                    <h3>📋 Seleccionar Productos</h3>
+                                    <p class="text-muted">Haz clic en "Añadir" para incluir productos en el pedido</p>
+                                    
+                                    <!-- Placeholder para productos - se cargarán dinámicamente -->
+                                    <div class="alert alert-info text-center">
+                                        <i class="fa fa-info-circle fa-2x mb-2"></i>
+                                        <h5>Productos disponibles</h5>
+                                        <p>Los productos se mostrarán aquí. Por ahora puedes añadir productos manualmente en la sección del pedido.</p>
                                     </div>
-                                    <div class="o_kanban_record_body">
-                                        <field name="categ_id" class="text-muted"/>
-                                        <t t-if="record.description_sale.raw_value">
-                                            <div class="text-muted o_tpv_product_description">
-                                                <field name="description_sale"/>
-                                            </div>
-                                        </t>
-                                    </div>
-                                </div>
-                                <div class="o_tpv_product_actions">
-                                    <button name="action_add_to_tpv_order" 
-                                            type="object" 
-                                            class="btn btn-primary btn-sm">
-                                        <i class="fa fa-plus"/> Añadir
-                                    </button>
                                 </div>
                             </div>
-                        </t>
-                    </templates>
-                </kanban>
+                            
+                            <!-- COLUMNA DERECHA: PEDIDO ACTUAL -->
+                            <div class="col-md-4">
+                                <div class="o_tpv_order_section">
+                                    <h3>🛒 Pedido Actual</h3>
+                                    <div class="o_tpv_order_summary">
+                                        <div class="mb-3">
+                                            <strong>Productos: </strong>
+                                            <span class="badge badge-primary">
+                                                <field name="total_items" readonly="1"/>
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Lista del pedido -->
+                                       <field name="line_ids" nolabel="1">
+                                            <list editable="bottom" create="true" delete="true">
+                                                <field name="product_id" options="{'no_create': True}"/>
+                                                <field name="quantity"/>
+                                                <field name="unit_price"/>
+                                                <field name="total_price" sum="Total"/>
+                                            </list>
+                                            <form>
+                                                <group>
+                                                    <field name="product_id"/>
+                                                    <field name="quantity"/>
+                                                    <field name="unit_price"/>
+                                                    <field name="total_price"/>
+                                                </group>
+                                            </form>
+                                        </field>
+                                        
+                                        <!-- Totales -->
+                                        <div class="o_tpv_totals mt-3 p-3 bg-light rounded">
+                                            <div class="row">
+                                                <div class="col-6"><strong>Subtotal:</strong></div>
+                                                <div class="col-6 text-right">
+                                                    <field name="amount_untaxed" readonly="1"/>€
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6"><strong>Impuestos:</strong></div>
+                                                <div class="col-6 text-right">
+                                                    <field name="amount_tax" readonly="1"/>€
+                                                </div>
+                                            </div>
+                                            <hr/>
+                                            <div class="row">
+                                                <div class="col-6"><h4>Total:</h4></div>
+                                                <div class="col-6 text-right">
+                                                    <h4 class="text-success">
+                                                        <field name="amount_total" readonly="1"/>€
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Notas -->
+                                        <div class="mt-3">
+                                            <field name="notes" placeholder="Notas especiales del pedido..." 
+                                                   invisible="state not in ['draft', 'confirmed']"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </sheet>
+                </form>
             </field>
         </record>
 
-        <!-- Acción principal para selección de productos -->
-        <record id="action_product_tpv_selection" model="ir.actions.act_window">
-            <field name="name">Seleccionar Productos</field>
-            <field name="res_model">product.product</field>
-            <field name="view_mode">kanban</field>
-            <field name="view_id" ref="view_product_product_tpv_kanban"/>
-            <field name="domain">[('sale_ok', '=', True)]</field>
-            <field name="context">{
-                'search_default_filter_to_sell': 1,
-                'search_default_filter_to_purchase': 0,
-            }</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Selecciona productos para añadir al pedido
-                </p>
-                <p>
-                    Haz clic en cualquier producto para añadirlo directamente al pedido de la mesa.
-                </p>
-            </field>
-        </record>
-
-        <!-- Vista de búsqueda personalizada para TPV -->
-        <record id="view_product_search_tpv" model="ir.ui.view">
-            <field name="name">product.product.search.tpv</field>
-            <field name="model">product.product</field>
+        <!-- Vista Lista de Pedidos -->
+        <record id="view_diferent_order_list" model="ir.ui.view">
+            <field name="name">diferent.order.list</field>
+            <field name="model">diferent.order</field>
             <field name="arch" type="xml">
-                <search>
-                    <field name="name" string="Producto" 
-                           filter_domain="['|', ('name', 'ilike', self), ('default_code', 'ilike', self)]"/>
-                    <filter string="Comidas" name="filter_food" 
-                            domain="[('categ_id.name', 'ilike', 'food')]"/>
-                    <filter string="Bebidas" name="filter_drinks" 
-                            domain="[('categ_id.name', 'ilike', 'drink')]"/>
-                    <filter string="Postres" name="filter_desserts" 
-                            domain="[('categ_id.name', 'ilike', 'dessert')]"/>
-                    <separator/>
-                    <filter string="Disponibles" name="filter_available" 
-                            domain="[('sale_ok', '=', True)]"/>
-                    <group expand="0" string="Agrupar por">
-                        <filter string="Categoría" name="group_category" 
-                                context="{'group_by': 'categ_id'}"/>
-                    </group>
-                </search>
+                <list>
+                    <field name="name"/>
+                    <field name="table_id"/>
+                    <field name="room_id"/>
+                    <field name="date_created"/>
+                    <field name="state" decoration-success="state == 'closed'" 
+                           decoration-info="state == 'draft'" 
+                           decoration-warning="state in ['confirmed', 'kitchen']"/>
+                    <field name="total_items"/>
+                    <field name="amount_total"/>
+                    <field name="waiter_id"/>
+                </list>
             </field>
+        </record>
+
+        <!-- Vista Formulario Simple de Pedidos -->
+        <record id="view_diferent_order_form" model="ir.ui.view">
+            <field name="name">diferent.order.form</field>
+            <field name="model">diferent.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_confirm" string="Confirmar" type="object" 
+                                class="btn-success" invisible="state != 'draft'"/>
+                        <button name="action_to_kitchen" string="A Cocina" type="object" 
+                                class="btn-info" invisible="state != 'confirmed'"/>
+                        <button name="action_close" string="Cerrar" type="object" 
+                                class="btn-primary" invisible="state not in ['confirmed', 'kitchen', 'ready', 'served']"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="table_id"/>
+                                <field name="room_id"/>
+                                <field name="waiter_id"/>
+                            </group>
+                            <group>
+                                <field name="date_created"/>
+                                <field name="date_confirmed"/>
+                                <field name="date_closed"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Productos">
+                                <field name="line_ids">
+                                    <list editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_price"/>
+                                        <field name="total_price"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Totales">
+                                <group>
+                                    <field name="total_items"/>
+                                    <field name="amount_untaxed"/>
+                                    <field name="amount_tax"/>
+                                    <field name="amount_total"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <group string="Notes">
+                            <field name="notes" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action para Pedidos -->
+        <record id="action_diferent_order" model="ir.actions.act_window">
+            <field name="name">Pedidos</field>
+            <field name="res_model">diferent.order</field>
+            <field name="view_mode">list,form</field>
         </record>
     </data>
 </odoo>

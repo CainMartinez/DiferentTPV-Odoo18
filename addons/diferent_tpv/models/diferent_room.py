@@ -34,7 +34,7 @@ class DiferentRoom(models.Model):
             'type': 'ir.actions.act_window',
             'name': f'Tables - {self.name}',
             'res_model': 'diferent.table',
-            'view_mode': 'kanban,tree,form',
+            'view_mode': 'kanban,list,form',
             'domain': [('room_id', '=', self.id)],
             'context': {'default_room_id': self.id},
         }
